@@ -3473,7 +3473,7 @@
   "resolved" "https://registry.npmjs.org/negotiator/-/negotiator-0.6.3.tgz"
   "version" "0.6.3"
 
-"next-routes@1.4.2":
+"next-routes@^1.4.2":
   "integrity" "sha512-1Ljs0BEV9IGcJLKxC/WZUtmftSvmkY6DlI8fVs8dClCoR82QRzBGRka/L/XB76wE5814MMeP9qVJYQil0FE9QQ=="
   "resolved" "https://registry.npmjs.org/next-routes/-/next-routes-1.4.2.tgz"
   "version" "1.4.2"
