@@ -1,10 +1,17 @@
-import React, {Component} from 'react';
+import React, { Component } from 'react';
 import factory from '../ethereum/factory';
 import { Card, Button } from 'semantic-ui-react';
-import Layout from '../components/Layout'
 import { Link } from '../routes';
+import Layout from '../components/Layout';
+
 
 class TeamworkIndex extends Component {
+
+    state = {
+        isWallet:false,
+        currentAccount:'',
+        isLoading:false
+    }
 
     static async getInitialProps(){
         const teams = await factory.methods.getTeamworks().call();
@@ -31,12 +38,12 @@ class TeamworkIndex extends Component {
     };
 
     render() {
-        return <Layout>
+        return <Layout setLoading={(isLoading) => this.setState({isLoading})} setWallet={(isWallet,currentAccount) => this.setState({isWallet,currentAccount})}>
             <div>
                 <h3>All Teams</h3>
                 <Link route="/teams/new">
                     <a>
-                    <Button floated="right" content = "Create Your Team" icon="add" secondary/>
+                    <Button floated="right" content = "Create Your Team" icon="add" secondary disabled={!this.state.isWallet} loading={this.state.isLoading}/>
                     </a>
                 </Link>
                 { this.props.teams.length>0 ? this.renderTeams():(<h3>No Teams Yet</h3>) }

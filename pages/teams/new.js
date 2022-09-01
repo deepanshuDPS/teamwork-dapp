@@ -1,19 +1,23 @@
-import React, {Component} from 'react';
+import React from 'react';
 import Layout from '../../components/Layout';
 import { Form, Button, Input, Message } from 'semantic-ui-react';
 import factory from '../../ethereum/factory';
 import web3 from '../../ethereum/web3';
 import { Router } from '../../routes';
+import BaseComponent from '../../components/BaseComponent';
 
-class NewTeam extends Component{
+class NewTeam extends BaseComponent{
 
     state = {
         teamName: '',
         teamCount:'',
         percentDivided:0,
         errorMessage: '',
-        loading:false
+        isLoading:false,
+        isWallet:false,
+        currentAccount:''
     };
+
 
     onSubmit = async (event) =>{
         event.preventDefault();
@@ -36,9 +40,11 @@ class NewTeam extends Component{
         this.setState({ loading:false });
     };
 
+
+
     render(){
         let paddingVertical = {padding:" 10px 0px 10px 0px "};
-        return <Layout>
+        return <Layout setLoading={(isLoading) => this.setState({isLoading})} setWallet={(isWallet,currentAccount) => this.setState({isWallet,currentAccount})}>
             <h3>New Team</h3>
             { /** !! "" => true
                  !! "false" => false **/  }
@@ -83,7 +89,7 @@ class NewTeam extends Component{
                         />
                 </Form.Field>
                 <Message error header = "Oops!" content={this.state.errorMessage} />
-                <Button secondary loading={this.state.loading}>Create!</Button>
+                <Button secondary loading={this.state.loading} disabled={!this.state.isWallet}>Create</Button>
             </Form>
         </Layout>
     }

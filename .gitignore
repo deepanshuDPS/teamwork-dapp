@@ -4,6 +4,7 @@
 /node_modules
 /.pnp
 /.next/
+/.next/**
 .pnp.js
 
 # testing
