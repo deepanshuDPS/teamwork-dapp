@@ -81,23 +81,22 @@ contract Teamwork {
         // function where we use this modifier
     }
 
+    // v2
     function registerAsMember() public {
         // team members not be equal to total members means the team if full
-        require(totalMembers != membersEntered);
         // check wheather team member already exist or not
-        require(teamMembers[msg.sender] == 0);
+        require(totalMembers != membersEntered && teamMembers[msg.sender] == 0);
         // 1 means member initiated for first payment
         teamMembers[msg.sender] = 1;
         members.push(msg.sender);
         membersEntered++;
-        teamStatus = membersEntered == totalMembers;
+        teamStatus = (membersEntered == totalMembers);
     }
 
+    // v2
     function payForServices() public payable {
-        // team status
-        require(teamStatus);
-        // value must to be paid must be greater than 0
-        //require(msg.value > 0);
+        // team status && client not to be a team member
+        require(teamStatus && teamMembers[msg.sender] == 0);
         /** 
         Is team payble??
         0 in starting
@@ -106,8 +105,6 @@ contract Teamwork {
         the teammembers 
         **/
         require(currentPay > getBalance() || currentPay == 0);
-        // client not to be a team member
-        require(teamMembers[msg.sender] == 0);
         paymentNumber++;
         currentPay = (msg.value * percentDivided) / 100;
     }
@@ -116,26 +113,24 @@ contract Teamwork {
         return teamStatus && (currentPay > getBalance() || currentPay == 0);
     }
 
+    //v2
     function getMyWage() public {
         // only collectable if team is full
         require(totalMembers == membersEntered);
-        // only get wage if you are a team member
-        require(teamMembers[msg.sender] > 0);
-        // payment is not completed for this
-        require(teamMembers[msg.sender] == paymentNumber);
+        // only get wage if you are a team member & payment is not completed for this
+        require(teamMembers[msg.sender] > 0 && teamMembers[msg.sender] == paymentNumber);
         // transfer money
         payable(msg.sender).transfer(currentPay);
         teamMembers[msg.sender] = teamMembers[msg.sender] + 1;
     }
 
     // only manager can send wages
+    // v2
     function sendWage(address teamMember) public restricted {
-        // you will not be a manager
-        require(manager != teamMember);
+        // you will not be a manager && a teamMember
+        require(manager != teamMember && teamMembers[teamMember] > 0);
         // only collectable if team is full
         require(totalMembers == membersEntered);
-        // only get wage if it is a team member
-        require(teamMembers[teamMember] > 0);
         // payed only if payment is not completed for this
         require(teamMembers[teamMember] == paymentNumber);
         // transfer money
@@ -149,11 +144,10 @@ contract Teamwork {
     }
 
     // block/unblock team
+    // v2
     function changeStatus(bool statusToSet) public restricted {
-        // only proceed when team is full
-        require(totalMembers == membersEntered);
-        // status to match
-        require(teamStatus != statusToSet);
+        // only proceed when team is full and status to match
+        require(totalMembers == membersEntered && teamStatus != statusToSet);
         teamStatus = statusToSet;
     }
 
@@ -173,19 +167,21 @@ contract Teamwork {
     }
 
     // get all team members with their status
+    // v2
     function getTeamMembers()
         public
         view
         returns (
             address[] memory,
             uint16[] memory,
-            uint16
+            uint16,
+            address
         )
     {
         uint16[] memory transactions = new uint16[](membersEntered);
         for (uint16 i = 0; i < membersEntered; i++) {
             transactions[i] = teamMembers[members[i]];
         }
-        return (members, transactions, paymentNumber);
+        return (members, transactions, paymentNumber, manager);
     }
 }

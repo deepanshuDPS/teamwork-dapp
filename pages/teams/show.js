@@ -92,8 +92,6 @@ class ShowTeam extends BaseComponent {
 
     isWageCollected = () => {
         const { transactions, teamMembers, currentAccount } = this.state;
-        console.log(teamMembers);
-        console.log(transactions)
         return teamMembers[this.getLowerCase(currentAccount)] != transactions;
     }
 
@@ -161,8 +159,8 @@ class ShowTeam extends BaseComponent {
 
     getIsPayableForClient = () => !this.getIsMember() && this.state.isWallet && this.props.isPayable;
 
-    isRegister = () => this.props.membersEntered != this.props.totalMembers;
-
+    isRegister = () => this.props.membersEntered != this.props.totalMembers && !this.getIsMember();
+    
     getIsOwner = () => this.state.isWallet && this.props.manager.toString().toLowerCase() === this.state.currentAccount.toString().toLowerCase()
 
     render() {
@@ -200,7 +198,7 @@ class ShowTeam extends BaseComponent {
 
                             }
                             {this.isRegister() ? <Button primary onClick={this.onRegister} loading={this.state.isLoading}>Register as Member</Button> : <></>}
-                            {this.getIsOwner() ? <Button primary onClick={this.onStatusChange} disabled={!this.isRegister} loading={this.state.isLoading}>{this.props.teamStatus ? 'Disable Team' : 'Enable Team'}</Button> : <></>}
+                            {this.getIsOwner() ? <Button primary onClick={this.onStatusChange} disabled={!this.props.isPayable} loading={this.state.isLoading}>{this.props.teamStatus ? 'Disable Team' : 'Enable Team'}</Button> : <></>}
                             {this.getIsMember() ? <Button secondary onClick={this.getWage} loading={this.state.isLoading} disabled={this.isWageCollected()}>Get My Wage</Button> : <></>}
                         </Grid.Column>
                     </Grid.Row>

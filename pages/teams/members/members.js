@@ -11,7 +11,7 @@ class TeamMembers extends BaseComponent{
         const {address} = props.query;
         console.log(address);
         let teamDetails = await Teamwork(address).methods.getTeamMembers().call();
-        return {address:address, teamMembers: teamDetails[0], manager:teamDetails[0][0], teamTransactions: teamDetails[1], transactions: teamDetails[2]};
+        return {address:address, teamMembers: teamDetails[0], manager:teamDetails[3], teamTransactions: teamDetails[1], transactions: teamDetails[2]};
     }
 
 

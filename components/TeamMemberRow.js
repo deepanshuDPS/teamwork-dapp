@@ -23,14 +23,16 @@ class TeamMemberRow extends Component {
 
     render(){
         const { Row, Cell } = Table;
-        const { id , memberAddress, isTransacted } = this.props;
+        const { id , memberAddress, isTransacted, manager } = this.props;
         return(
             <Row disabled = {isTransacted} positive={isTransacted}>
                 <Cell>{id+1}</Cell>
                 <Cell>{memberAddress}</Cell>
                 <Cell>
+                    {manager!=memberAddress?
                     <Button color="green" basic
                         onClick={this.onSendWage} disabled={isTransacted}>SendWage</Button>
+                        :<></>}
                 </Cell>
             </Row>
         );
