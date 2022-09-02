@@ -97,7 +97,7 @@ contract Teamwork {
         // team status
         require(teamStatus);
         // value must to be paid must be greater than 0
-        require(msg.value > 0);
+        //require(msg.value > 0);
         /** 
         Is team payble??
         0 in starting

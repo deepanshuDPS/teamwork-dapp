@@ -12,10 +12,7 @@ class NewTeam extends BaseComponent{
         teamName: '',
         teamCount:'',
         percentDivided:0,
-        errorMessage: '',
-        isLoading:false,
-        isWallet:false,
-        currentAccount:''
+        errorMessage: ''
     };
 
 
@@ -44,7 +41,7 @@ class NewTeam extends BaseComponent{
 
     render(){
         let paddingVertical = {padding:" 10px 0px 10px 0px "};
-        return <Layout setLoading={(isLoading) => this.setState({isLoading})} setWallet={(isWallet,currentAccount) => this.setState({isWallet,currentAccount})}>
+        return <Layout setLoading={this.setIsLoading} setWallet={(isWallet,currentAccount) => this.setWallet(isWallet,currentAccount)}>
             <h3>New Team</h3>
             { /** !! "" => true
                  !! "false" => false **/  }

@@ -1,9 +1,25 @@
 import {Component} from 'react';
-import web3 from '../ethereum/web3';
-import currentWindow from '../ethereum/ethereum';
 
 export default class BaseComponent extends Component{
 
-    
+    state = {
+        isWallet: false,
+        currentAccount:'',
+        isLoading: false
+    }
+
+    setIsLoading = (loading) =>{
+        this.setState({ isLoading: loading })
+    }
+
+    setWallet = (isWallet,currentAccount) => {
+        this.setState(
+            { isWallet, currentAccount }
+        );
+    }
+
+    onReload = () =>{
+        window.location.reload();
+    }
 
 }

@@ -1,40 +1,52 @@
-import React, { Component } from 'react';
+import React from 'react';
 import { Card, Grid, Button } from 'semantic-ui-react';
 import Layout from '../../components/Layout';
 import Teamwork from '../../ethereum/teamwork';
 import { Link } from '../../routes';
-import PayForServicesForm from '../../components/payForServices';
+import PayForServicesForm from '../../components/PayForServices';
+import BaseComponent from '../../components/BaseComponent';
 
-class ShowTeam extends Component{
+
+class ShowTeam extends BaseComponent {
 
     state = {
-        isWallet: false,
-        currentAccount:'',
-        isLoading: false,
-        teamMembers : [],
-        isOwner:false
+        teamMembers: {},
+        transactions: 0,
+        teamLoaded: false
     }
 
-    setIsLoading = (loading) =>{
-        this.setState({ isLoading: loading })
-    }
-
-
-    static async getInitialProps(props){
+    static async getInitialProps(props) {
         // props has slug for the redirect path
+        
         const teamwork = Teamwork(props.query.address);
         const summary = await teamwork.methods.getSummary().call();
         const payable = await teamwork.methods.isPayable().call();
 
-        return { 
+        return {
             address: props.query.address,
             isPayable: payable,
-            membersEntered : summary[0],
-            totalMembers : summary[1],
+            membersEntered: summary[0],
+            totalMembers: summary[1],
             teamStatus: summary[2],
-            teamName:summary[3],
+            teamName: summary[3],
             manager: summary[4]
         };
+    }
+
+    onStatusChange = async () => {
+        this.setIsLoading(true);
+        try{
+            await Teamwork(this.props.address).methods
+                    .changeStatus(!this.props.teamStatus)
+                    .send({
+                        from:this.state.currentAccount
+                    });
+            this.onReload();
+        }catch(err){
+            console.log(err);
+        }
+
+        this.setIsLoading(false);
     }
 
     onRegister = async () => {
@@ -47,8 +59,8 @@ class ShowTeam extends Component{
                 .send({
                     from: this.state.currentAccount
                 });
-            Router.pushRoute(`/teams/${this.props.address}`);
-        } catch(err){
+            this.onReload();
+        } catch (err) {
             console.log(err);
         }
         this.setIsLoading(false);
@@ -56,7 +68,7 @@ class ShowTeam extends Component{
 
     getWage = async () => {
         this.setIsLoading(true);
-        try{
+        try {
             // metamask automatically decides gas for transactions
             var teamwork = Teamwork(this.props.address);
             await teamwork.methods
@@ -64,28 +76,43 @@ class ShowTeam extends Component{
                 .send({
                     from: this.state.currentAccount
                 });
-            Router.pushRoute(`/teams/${this.props.address}`);
-        }catch(err){
+            this.onReload();
+        } catch (err) {
             console.log(err);
         }
         this.setIsLoading(false);
     }
 
     getIsMember = () => {
-        const { isWallet, teamMembers, currentAccount } = this.state;
-        return isWallet && teamMembers.find((it)=> this.getLowerCase(it) === this.getLowerCase(currentAccount)) !== undefined;
+        const { teamLoaded, teamMembers, currentAccount } = this.state;
+        return teamLoaded && teamMembers[this.getLowerCase(currentAccount)] !== undefined;
     }
 
-    getLowerCase = (str) => str.toString().toLowerCase();
+    getLowerCase = (str) => str==undefined ? '': str.toString().toLowerCase();
 
-    getAllMembers = async () =>{
+    isWageCollected = () => {
+        const { transactions, teamMembers, currentAccount } = this.state;
+        console.log(teamMembers);
+        console.log(transactions)
+        return teamMembers[this.getLowerCase(currentAccount)] != transactions;
+    }
+
+    getAllMembers = async () => {
         this.setIsLoading(true)
-        let members = await Teamwork(this.props.address).methods.getTeamMembers().call();
-        this.setState({ teamMembers: members[0] })
+        let teamDetails = await Teamwork(this.props.address).methods.getTeamMembers().call();
         this.setIsLoading(false)
+        let members = {};
+        for (var i = 0; i < teamDetails[0].length; i++) {
+            members[this.getLowerCase(teamDetails[0][i])] = teamDetails[1][i];
+        }
+        this.setState({
+            teamMembers: members,
+            transactions: teamDetails[2],
+            teamLoaded: true
+        })
     }
 
-    componentDidMount = async () =>{
+    componentDidMount = async () => {
         await this.getAllMembers();
     }
 
@@ -98,56 +125,51 @@ class ShowTeam extends Component{
             teamStatus,
             isPayable
         } = this.props
-        
+
         let items = [
             {
-                header: this.state.isOwner ? "It's You" : manager.substring(0,5)+'xxxxx'+manager.substring(40,44),
+                header: this.getIsOwner() ? "It's You" : manager.substring(0, 5) + 'xxxxx' + manager.substring(40, 44),
                 meta: 'Address of Manager',
-                description: 'The manager created this team and have more access than normal team members',
-                style: {overflowWrap: 'break-word'}
+                description: 'The manager who created or manage the team.',
+                style: { overflowWrap: 'break-word' }
             },
             {
                 header: teamName,
                 meta: 'Team Name',
-                description: 'You must contribute at least this much wei to become an approver'
+                description: 'The name is known as their team name.'
             },
             {
-                header: membersEntered +' | '+ totalMembers,
+                header: membersEntered + ' | ' + totalMembers,
                 meta: 'Members in Team | Members allowed',
-                description: 'The request tries to withdraw money from the campaign. Requests must be approved by approvers'
+                description: 'Members in the team who is working for team.'
             },
             {
-                header: teamStatus? 'Active': 'Not-Active',
+                header: teamStatus ? 'Active' : 'Not-Active',
                 meta: 'Team Status',
-                description: 'Number of people who have already donated to this campaign'
-            },
-            {
-                header: isPayable? 'You can pay or donate': 'You cannot pay for now',
-                meta: 'Is team ready to get paid?',
-                description: 'The balance is how much money this campaign has left to spend'
+                description: 'Is this team active to work or not?'
             }
         ];
+        if (!this.getIsMember() && this.state.teamLoaded && this.state.isWallet)
+            items.push({
+                header: isPayable ? "Yes, you can pay" : "No, you can't pay",
+                meta: 'Is team ready to get paid?',
+                description: 'If all team members collected their wages then team is payable.'
+            })
 
         return <Card.Group items={items} />
     }
 
-    setWallet = (isWallet,currentAccount) =>{
-        this.setState(
-            {
-                isWallet:isWallet, 
-                currentAccount:currentAccount, 
-                isOwner: isWallet && this.props.manager.toString().toLowerCase() === currentAccount.toString().toLowerCase()
-            }
-        );
-        }
+    getIsPayableForClient = () => !this.getIsMember() && this.state.isWallet && this.props.isPayable;
 
     isRegister = () => this.props.membersEntered != this.props.totalMembers;
 
-    render(){
+    getIsOwner = () => this.state.isWallet && this.props.manager.toString().toLowerCase() === this.state.currentAccount.toString().toLowerCase()
+
+    render() {
 
         return (
-            <Layout setLoading={this.setIsLoading} setWallet={this.setWallet} >
-            
+            <Layout setLoading={this.setIsLoading} setWallet={(isWallet, currentAccount) => this.setWallet(isWallet, currentAccount)} >
+
                 <h3>Team - {this.props.teamName}</h3>
                 <Grid>
                     <Grid.Row>
@@ -155,26 +177,31 @@ class ShowTeam extends Component{
                             {this.renderCards()}
                         </Grid.Column>
                         {
-                        this.getIsMember()? <div></div>:
-                            <Grid.Column width={6}>
-                                <PayForServicesForm address={this.props.address} currentAccount={this.state.currentAccount} teamMembers={this.props.totalMembers} /> 
-                            </Grid.Column>
+                            this.getIsPayableForClient() ?
+                                <Grid.Column width={6}>
+                                    <PayForServicesForm
+                                        address={this.props.address}
+                                        currentAccount={this.state.currentAccount}
+                                        teamMembers={this.props.totalMembers}
+                                        onReload={this.onReload} />
+                                </Grid.Column> : <></>
+
                         }
                     </Grid.Row>
                     <Grid.Row>
                         <Grid.Column>
                             {
-                                this.state.isOwner?
+                                this.getIsOwner() ?
                                     <Link route={`${this.props.address}/members`} >
-                                    <a>
-                                        <Button secondary loading={this.state.isLoading}>Team Members</Button>
-                                    </a>
-                                    </Link>:<></>
-                                
+                                        <a>
+                                            <Button secondary loading={this.state.isLoading}>Team Members</Button>
+                                        </a>
+                                    </Link> : <></>
+
                             }
-                            {this.isRegister()? <Button primary onClick={this.onRegister} loading={this.state.isLoading}>Register as Member</Button>:<></>}
-                            {this.state.isOwner? <Button primary disabled={!this.isRegister} loading={this.state.isLoading}>{this.props.teamStatus?'Disable Team':'Enable Team'}</Button>:<></>}
-                            {this.getIsMember()? <Button secondary onClick={this.getWage} loading={this.state.isLoading}>Get My Wage</Button>:<></>}
+                            {this.isRegister() ? <Button primary onClick={this.onRegister} loading={this.state.isLoading}>Register as Member</Button> : <></>}
+                            {this.getIsOwner() ? <Button primary onClick={this.onStatusChange} disabled={!this.isRegister} loading={this.state.isLoading}>{this.props.teamStatus ? 'Disable Team' : 'Enable Team'}</Button> : <></>}
+                            {this.getIsMember() ? <Button secondary onClick={this.getWage} loading={this.state.isLoading} disabled={this.isWageCollected()}>Get My Wage</Button> : <></>}
                         </Grid.Column>
                     </Grid.Row>
                 </Grid>

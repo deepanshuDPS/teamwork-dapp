@@ -20,7 +20,7 @@ class Layout extends Component {
 
     componentDidMount = async () => {
         // subscribed for web3 events to check accounts data
-        if(currentWindow !== 'undefined'){
+        if(currentWindow != undefined){
             let accounts = await web3.eth.getAccounts();
             this.setAccount(accounts);
             currentWindow.ethereum.on('accountsChanged', (accounts) => {
