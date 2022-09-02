@@ -5,6 +5,7 @@ import { Link } from '../routes';
 import Layout from '../components/Layout';
 import BaseComponent from '../components/BaseComponent';
 
+
 class TeamworkIndex extends BaseComponent {
 
     static async getInitialProps(){

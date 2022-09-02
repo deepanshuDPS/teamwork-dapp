@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "test": "mocha --openssl-legacy-provider test",
-    "dev": "node server.js --openssl-legacy-provider"
+    "dev": "node server.js --openssl-legacy-provider",
+    "build": "next build",
+    "export": "next export"
   },
   "author": "Deepanshu",
   "license": "ISC",
@@ -17,6 +19,7 @@
     "ganache-cli": "6.12.2",
     "mocha": "10.0.0",
     "next": "12.2.5",
+    "next-pwa": "^5.6.0",
     "next-routes": "^1.4.2",
     "react": "18.2.0",
     "react-dom": "18.2.0",
