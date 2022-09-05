@@ -23,10 +23,10 @@ class TeamMemberRow extends Component {
 
     render(){
         const { Row, Cell } = Table;
-        const { id , memberAddress, isTransacted, manager } = this.props;
+        const { sno , memberAddress, isTransacted, manager } = this.props;
         return(
             <Row disabled = {isTransacted} positive={isTransacted}>
-                <Cell>{id+1}</Cell>
+                <Cell>{sno}</Cell>
                 <Cell>{memberAddress}</Cell>
                 <Cell>
                     {manager!=memberAddress?

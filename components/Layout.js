@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { Container } from "semantic-ui-react";
 import Header from './Header';
 import Head from 'next/head';
+import Script from 'next/script'
 import web3 from '../ethereum/web3';
 import currentWindow from '../ethereum/ethereum';
 
@@ -38,7 +39,7 @@ class Layout extends Component {
             <Container>
                 <Head>
                     <link async rel="stylesheet" href="https://cdn.jsdelivr.net/npm/semantic-ui@2/dist/semantic.min.css" />
-                    <script src="https://cdn.jsdelivr.net/npm/semantic-ui-react/dist/umd/semantic-ui-react.min.js"></script>
+                    <Script src="https://cdn.jsdelivr.net/npm/semantic-ui-react/dist/umd/semantic-ui-react.min.js"></Script>
                     <meta name="application-name" content="Teamwork" />
                     <meta name="apple-mobile-web-app-capable" content="yes" />
                     <meta name="apple-mobile-web-app-status-bar-style" content="default" />

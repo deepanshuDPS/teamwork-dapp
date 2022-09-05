@@ -7,9 +7,8 @@ routes
     .add('/teams/new', '/teams/new')
     .add('/','/index')
     .add('/teams/:address', '/teams/show')
-    .add('/teams/:address/members','/teams/members/members')
-    .add('/campaigns/:address/requests/new','/campaigns/requests/new');
-
+    .add('/teams/:address/members','/teams/members/members');
+    
 module.exports = routes;
 
 

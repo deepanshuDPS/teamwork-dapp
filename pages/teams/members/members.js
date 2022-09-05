@@ -21,7 +21,8 @@ class TeamMembers extends BaseComponent{
         for(var i=0; i < teamMembers.length;i++){
             members.push(
                 <TeamMemberRow  
-                    id={i}
+                    key={i}
+                    sno={i+1}
                     memberAddress={teamMembers[i]}
                     manager={manager}
                     isTransacted={teamTransactions[i]!=this.props.transactions}

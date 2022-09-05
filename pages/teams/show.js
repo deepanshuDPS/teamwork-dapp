@@ -190,7 +190,7 @@ class ShowTeam extends BaseComponent {
                         <Grid.Column>
                             {
                                 this.getIsOwner() ?
-                                    <Link route={`${this.props.address}/members`} >
+                                    <Link href={`${this.props.address}/members`} >
                                         <a>
                                             <Button secondary loading={this.state.isLoading}>Team Members</Button>
                                         </a>
