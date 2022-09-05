@@ -145,6 +145,11 @@ class ShowTeam extends BaseComponent {
                 header: teamStatus ? 'Active' : 'Not-Active',
                 meta: 'Team Status',
                 description: 'Is this team active to work or not?'
+            },
+            {
+                header: `${100/totalMembers}%`,
+                meta: 'Percentage',
+                description: 'Percentage of total payment to be given to each employee'
             }
         ];
         if (!this.getIsMember() && this.state.teamLoaded && this.state.isWallet)
